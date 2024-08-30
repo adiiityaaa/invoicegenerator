@@ -1,0 +1,62 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thank You</title>
+    <link rel="stylesheet" href="/sent.css">
+    <link rel="icon" href="/invoice.ico" type="image/x-icon">
+</head>
+<body>
+ <div class="top-bar">
+        <a href="/" class="about-button">Home</a>
+        <a href="/about" class="about-button">About</a>
+    </div>
+    <div class="container">
+        <header>
+            <h1>Thank You!</h1>
+            <p>Invoice has been sent successfully.</p>
+        </header>
+        <section class="details">
+            <h2>Reciever Details:</h2>
+            <div class="info">
+                <p><strong>Name:</strong> <%= name %></p>
+                <p><strong>Email:</strong> <%= email %></p>
+                <p><strong>Phone:</strong> <%= phone %></p>
+                <p><strong>From:</strong> <%= company %></p>
+            </div>
+        </section>
+        <section class="invoice-details">
+            <h2>Invoice Details:</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% filteredParts.forEach(part => { %>
+                        <tr>
+                            <td><%= part.description %></td>
+                            <td><%= part.price %></td>
+                            <td><%= part.quantity %></td>
+                            <td><%= part.total %></td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3"><strong>Total</strong></td>
+                        <td><strong><%= grandTotal %> INR</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </section>
+        <div class="actions">
+            <a href="/invoice" class="btn">Submit Another Invoice?</a>
+        </div>
+    </div>
+</body>
+</html>

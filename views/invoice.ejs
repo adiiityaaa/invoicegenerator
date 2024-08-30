@@ -1,0 +1,166 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/invoice.css">
+    <link rel="icon" href="/invoice.ico" type="image/x-icon">
+    <title>Invoice Form</title>
+</head>
+<body>
+ <div class="top-bar">
+        <a href="/" class="about-button">Home</a>
+        <a href="/about" class="about-button">About</a>
+    </div>
+    <div class="form-container">
+        <h1>Receiver Details: </h1>
+        <form action="/submit" method="POST" enctype="multipart/form-data">
+            <label for="status">Payment Status:</label>
+            <select id="status" name="status" required>
+                <option value="Paid">Paid</option>
+                <option value="Due">Due</option>
+            </select>
+            
+            <div class="field-group">
+                <div class="field">
+                    <label for="name">Receiver Name:</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+            </div>
+            
+            <div class="field-group">
+                <div class="field">
+                    <label for="phone">Receiver Phone Number:</label>
+                    <input type="number" id="phone" name="phone" required>
+                </div>
+                <div class="field">
+                    <label for="email">Receiver Email:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+            </div>
+            
+            <h2>Company Details</h2>
+            <div class="field-group">
+                <div class="field">
+                    <label for="company">Company Name:</label>
+                    <input type="text" id="company" name="company" required>
+                </div>
+            </div>
+            <div class="field-group">
+                <div class="field">
+                    <label for="comphone">Company Phone Number:</label>
+                    <input type="number" id="comphone" name="comphone" required>
+                </div>
+                <div class="field">
+                    <label for="commail">Company Email:</label>
+                    <input type="email" id="commail" name="commail" required>
+                </div>
+            </div>
+            <div class="field-group">
+                <div class="field">
+                    <label for="comadd1">Address Line 1:</label>
+                    <input type="text" id="comadd1" name="comadd1" required>
+                </div>
+                <div class="field">
+                    <label for="comadd2">Address Line 2:</label>
+                    <input type="text" id="comadd2" name="comadd2" required>
+                </div>
+                <div class="field">
+                    <label for="incomadd3">Address Line 3:</label>
+                    <input type="text" id="incomadd3" name="incomadd3">
+                </div>
+            </div>
+           <h2>Company Logo:</h2>
+            <div class="field-group">
+             <div class="field">
+              <label for="logo" id="fileLabel" class="custom-file-upload">Choose File</label>
+              <input type="file" id="logo" name="logo" accept="image/jpeg, image/png" onchange="validateFileInput(this)" style="display: none;">
+             </div>
+            </div>
+            
+            <h2>Invoice Details:</h2> 
+            <div class="field-group">
+                <div class="field">
+                    <label for="incomment">Comment:</label>
+                    <input type="text" id="incomment" name="incomment">
+                </div>
+            </div>
+            <table id="dynamicTable">
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="text" name="description[]" oninput="addRowIfNeeded(this)"></td>
+                        <td><input type="number" name="price[]" oninput="calculateSubtotal(this)"></td>
+                        <td><input type="number" name="quantity[]" oninput="calculateSubtotal(this)"></td>
+                        <td><input type="text" name="total[]" readonly></td>
+                    </tr>
+                </tbody>
+            </table>
+            <br>
+            <input type="submit" value="Send Invoice">
+        </form>
+    </div>
+
+    <script>
+        function addRowIfNeeded(element) {
+            const row = element.closest('tr');
+            const isLastRow = row.nextElementSibling === null;
+            if (isLastRow) {
+                const newRow = document.createElement('tr');
+                for (let i = 0; i < 4; i++) {
+                    const newCell = document.createElement('td');
+                    const newInput = document.createElement('input');
+                    newInput.type = i === 0 ? 'text' : 'number';
+                    newInput.name = i === 0 ? `description[]` : i === 3 ? `total[]` : i === 1 ? `price[]` : `quantity[]`;
+                    if (i === 3) newInput.readOnly = true;
+                    newInput.oninput = () => {
+                        addRowIfNeeded(newInput);
+                        if (i === 1 || i === 2) calculateSubtotal(newInput);
+                    };
+                    newCell.appendChild(newInput);
+                    newRow.appendChild(newCell);
+                }
+                document.querySelector('#dynamicTable tbody').appendChild(newRow);
+            }
+        }
+
+        function calculateSubtotal(element) {
+            const row = element.closest('tr');
+            const price = parseFloat(row.querySelector('input[name="price[]"]').value) || 0;
+            const quantity = parseInt(row.querySelector('input[name="quantity[]"]').value) || 0;
+            const subtotal = price * quantity;
+            row.querySelector('input[name="total[]"]').value = subtotal.toFixed(2);
+        }
+        
+        function updateFileName(input) {
+           const fileName = input.files[0] ? input.files[0].name : 'Please choose a Logo.';
+           document.getElementById('fileLabel').textContent = fileName;
+        }
+        
+        function validateFileInput(input) {
+            const file = input.files[0];
+            if (file) {
+                const validTypes = ['image/jpeg', 'image/png'];
+                if (!validTypes.includes(file.type)) {
+                    alert('Logo can only be of type JPG or PNG.');
+                    input.value = '';
+                    return false;
+                }
+                if (file.size > 3 * 1024 * 1024) { 
+                    alert('Logo size must be under 3MB.');
+                    input.value = ''; 
+                    return false;
+                }
+                updateFileName(input); 
+            }
+            return true;
+        }
+    </script>
+</body>
+</html>
